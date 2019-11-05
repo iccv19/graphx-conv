@@ -281,7 +281,7 @@ class PointcloudDeformNet(nnt.Net, nnt.Module):
 
         self.optim = {}
 
-        self.optim['optimizer'] = T.optim.Adam(self.trainable, 1e-4, weight_decay=0) if optimizer is None
+        self.optim['optimizer'] = T.optim.Adam(self.trainable, 1e-4, weight_decay=0) if optimizer is None \
             else optimizer(self.trainable)
         self.optim['scheduler'] = scheduler(self.optim['optimizer']) if scheduler else None
         self.kwargs = kwargs
