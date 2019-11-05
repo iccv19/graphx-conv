@@ -42,12 +42,12 @@ def train_valid(data_root, name, img_enc, pc_enc, pc_dec, optimizer, scheduler, 
 
     train_data = ShapeNet(path=data_root, grayscale=not color_img, type='train', n_points=n_points)
     sampler = WeightedRandomSampler(train_data.sample_weights, len(train_data), True)
-    train_loader = DataLoader(train_data, batch_size=bs, num_workers=1, collate_fn=collate, drop_last=True,
+    train_loader = DataLoader(train_data, batch_size=bs, num_workers=8, collate_fn=collate, pin_memory=True, drop_last=True,
                               sampler=sampler)
 
     val_data = ShapeNet(path=data_root, grayscale=not color_img, type='valid', num_vals=10 * len(os.listdir(data_root)),
                         n_points=n_points)
-    val_loader = DataLoader(val_data, batch_size=bs, shuffle=False, num_workers=1, collate_fn=collate, drop_last=True)
+    val_loader = DataLoader(val_data, batch_size=bs, shuffle=False, num_workers=8, collate_fn=collate, pin_memory=True, drop_last=True)
 
     if checkpoint_folder is None:
         mon = nnt.Monitor(name, print_freq=print_freq, num_iters=len(train_data) // bs, use_tensorboard=True)
@@ -80,7 +80,7 @@ def train_valid(data_root, name, img_enc, pc_enc, pc_dec, optimizer, scheduler, 
 
         print('Resume from epoch %d...' % mon.get_epoch())
 
-    mon.run_training(net, train_loader, n_epochs, val_loader, valid_freq=val_freq, reduce='mean')
+    mon.run_training(net, net.optim, train_loader, n_epochs, val_loader, valid_freq=val_freq, reduce='mean')
     print('Training finished!')
 
 
