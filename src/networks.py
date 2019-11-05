@@ -315,13 +315,13 @@ class PointcloudDeformNet(nnt.Net, nnt.Module):
         self.stats['eval']['scalars']['eval_chamfer'] = nnt.utils.to_numpy(loss)
         del loss
 
-    def learn(self, init_pc, input, gt_pc, *args, **kwargs):
+    def learn(self, optim, init_pc, input, gt_pc, *args, **kwargs):
         self.train(True)
-        self.optim['optimizer'].zero_grad()
+        optim['optimizer'].zero_grad()
         loss = self.train_procedure(init_pc, input, gt_pc, reduce='mean')
         if not (T.isnan(loss) or T.isinf(loss)):
             loss.backward()
-            self.optim['optimizer'].step()
+            optim['optimizer'].step()
 
         self.stats['train']['scalars']['chamfer'] = nnt.utils.to_numpy(loss)
         del loss
